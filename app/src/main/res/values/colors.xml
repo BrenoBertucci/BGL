@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- CINEGLOW brand palette -->
+    <color name="navy_deep">#FF060814</color>
+    <color name="navy_dark">#FF0C1230</color>
+    <color name="navy_mid">#FF182452</color>
+    <color name="navy_glow">#FF2A3A7A</color>
+
+    <color name="gold">#FFE9C46A</color>
+    <color name="gold_bright">#FFF6D98A</color>
+    <color name="gold_deep">#FFB8860B</color>
+
+    <!-- Liquid glass tones -->
+    <color name="glass_fill">#26FFFFFF</color>
+    <color name="glass_fill_soft">#14FFFFFF</color>
+    <color name="glass_stroke">#4DFFFFFF</color>
+    <color name="glass_highlight">#66FFFFFF</color>
+
+    <color name="text_primary">#FFF4F6FF</color>
+    <color name="text_secondary">#B3C4CCE8</color>
+    <color name="text_hint">#80AEB6D8</color>
+</resources>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Base vertical navy gradient -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="@color/navy_deep"
+                android:centerColor="@color/navy_dark"
+                android:endColor="@color/navy_deep" />
+        </shape>
+    </item>
+    <!-- Soft radial glow behind the logo (top) -->
+    <item android:gravity="top" android:height="520dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="420dp"
+                android:centerX="0.5"
+                android:centerY="0.18"
+                android:startColor="#552A3A7A"
+                android:centerColor="#22182452"
+                android:endColor="@android:color/transparent" />
+        </shape>
+    </item>
+    <!-- Warm gold ambience near the button area (bottom) -->
+    <item android:gravity="bottom" android:height="420dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="360dp"
+                android:centerX="0.5"
+                android:centerY="0.9"
+                android:startColor="#22E9C46A"
+                android:endColor="@android:color/transparent" />
+        </shape>
+    </item>
+</layer-list>

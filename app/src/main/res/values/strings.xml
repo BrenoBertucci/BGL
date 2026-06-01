@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">BGL</string>
+
+    <!-- Brand -->
+    <string name="brand_name">CINEGLOW</string>
+
+    <!-- Login -->
+    <string name="login_subtitle">Sua experiência de cinema premium</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Senha</string>
+    <string name="action_login">Entrar</string>
+    <string name="forgot_password">Esqueceu a senha?</string>
+    <string name="no_account">Não tem conta? Cadastre-se</string>
+
+    <!-- Sign up -->
+    <string name="signup_title">Crie sua conta</string>
+    <string name="hint_full_name">Nome completo</string>
+    <string name="hint_confirm_password">Confirmar senha</string>
+    <string name="action_signup">Cadastrar</string>
+    <string name="have_account">Já tem conta? Faça login</string>
+
+    <!-- Validation -->
+    <string name="error_required">Campo obrigatório</string>
+    <string name="error_email_invalid">Email inválido</string>
+    <string name="error_password_short">A senha deve ter ao menos 6 caracteres</string>
+    <string name="error_password_mismatch">As senhas não coincidem</string>
+    <string name="msg_login_success">Bem-vindo de volta!</string>
+    <string name="msg_signup_success">Conta criada com sucesso!</string>
+</resources>
