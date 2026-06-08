@@ -15,10 +15,15 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.bgl.controller.AuthController;
+
 public class LoginActivity extends AppCompatActivity {
 
     private EditText inputEmail;
     private EditText inputPassword;
+    private Button btnLogin;
+
+    private AuthController authController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,14 +37,15 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
 
+        authController = new AuthController(this);
+
         inputEmail = findViewById(R.id.input_email);
         inputPassword = findViewById(R.id.input_password);
-
-        Button btnLogin = findViewById(R.id.btn_login);
+        btnLogin = findViewById(R.id.btn_login);
         TextView linkSignup = findViewById(R.id.link_signup);
         TextView linkForgot = findViewById(R.id.link_forgot);
 
-        btnLogin.setOnClickListener(v -> attemptLogin());
+        btnLogin.setOnClickListener(v -> fazerLogin());
 
         linkSignup.setOnClickListener(v ->
                 startActivity(new Intent(LoginActivity.this, SignupActivity.class)));
@@ -48,9 +54,9 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(this, R.string.forgot_password, Toast.LENGTH_SHORT).show());
     }
 
-    private void attemptLogin() {
+    private void fazerLogin() {
         String email = inputEmail.getText().toString().trim();
-        String password = inputPassword.getText().toString();
+        String senha = inputPassword.getText().toString();
 
         if (TextUtils.isEmpty(email)) {
             inputEmail.setError(getString(R.string.error_required));
@@ -62,13 +68,38 @@ public class LoginActivity extends AppCompatActivity {
             inputEmail.requestFocus();
             return;
         }
-        if (password.length() < 6) {
+        if (senha.length() < 6) {
             inputPassword.setError(getString(R.string.error_password_short));
             inputPassword.requestFocus();
             return;
         }
 
-        // TODO: hook real authentication here.
-        Toast.makeText(this, R.string.msg_login_success, Toast.LENGTH_SHORT).show();
+        carregando(true);
+        authController.login(email, senha, new AuthController.AuthCallback() {
+            @Override
+            public void onSucesso() {
+                carregando(false);
+                Toast.makeText(LoginActivity.this, R.string.msg_login_success, Toast.LENGTH_SHORT).show();
+                irParaPrincipal();
+            }
+
+            @Override
+            public void onErro(String mensagem) {
+                carregando(false);
+                Toast.makeText(LoginActivity.this, mensagem, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void irParaPrincipal() {
+        Intent intent = new Intent(this, MenuActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    private void carregando(boolean ativo) {
+        btnLogin.setEnabled(!ativo);
+        btnLogin.setText(ativo ? "Entrando..." : getString(R.string.action_login));
     }
 }

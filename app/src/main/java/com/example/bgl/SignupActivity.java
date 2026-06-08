@@ -1,5 +1,6 @@
 package com.example.bgl;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
@@ -14,12 +15,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.bgl.controller.AuthController;
+
 public class SignupActivity extends AppCompatActivity {
 
     private EditText inputName;
     private EditText inputEmail;
     private EditText inputPassword;
     private EditText inputConfirm;
+    private Button btnSignup;
+
+    private AuthController authController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,27 +39,28 @@ public class SignupActivity extends AppCompatActivity {
             return insets;
         });
 
+        authController = new AuthController(this);
+
         inputName = findViewById(R.id.input_name);
         inputEmail = findViewById(R.id.input_email);
         inputPassword = findViewById(R.id.input_password);
         inputConfirm = findViewById(R.id.input_confirm);
-
-        Button btnSignup = findViewById(R.id.btn_signup);
+        btnSignup = findViewById(R.id.btn_signup);
         TextView linkLogin = findViewById(R.id.link_login);
 
-        btnSignup.setOnClickListener(v -> attemptSignup());
+        btnSignup.setOnClickListener(v -> fazerCadastro());
 
-        // Return to the login screen.
+        // Volta para a tela de login.
         linkLogin.setOnClickListener(v -> finish());
     }
 
-    private void attemptSignup() {
-        String name = inputName.getText().toString().trim();
+    private void fazerCadastro() {
+        String nome = inputName.getText().toString().trim();
         String email = inputEmail.getText().toString().trim();
-        String password = inputPassword.getText().toString();
-        String confirm = inputConfirm.getText().toString();
+        String senha = inputPassword.getText().toString();
+        String confirma = inputConfirm.getText().toString();
 
-        if (TextUtils.isEmpty(name)) {
+        if (TextUtils.isEmpty(nome)) {
             inputName.setError(getString(R.string.error_required));
             inputName.requestFocus();
             return;
@@ -63,19 +70,41 @@ public class SignupActivity extends AppCompatActivity {
             inputEmail.requestFocus();
             return;
         }
-        if (password.length() < 6) {
+        if (senha.length() < 6) {
             inputPassword.setError(getString(R.string.error_password_short));
             inputPassword.requestFocus();
             return;
         }
-        if (!password.equals(confirm)) {
+        if (!senha.equals(confirma)) {
             inputConfirm.setError(getString(R.string.error_password_mismatch));
             inputConfirm.requestFocus();
             return;
         }
 
-        // TODO: hook real account creation here.
-        Toast.makeText(this, R.string.msg_signup_success, Toast.LENGTH_SHORT).show();
-        finish();
+        carregando(true);
+        authController.cadastrar(nome, email, senha, new AuthController.AuthCallback() {
+            @Override
+            public void onSucesso() {
+                carregando(false);
+                Toast.makeText(SignupActivity.this, R.string.msg_signup_success, Toast.LENGTH_SHORT).show();
+
+                // Sem confirmação de e-mail: vai direto para o menu.
+                Intent intent = new Intent(SignupActivity.this, MenuActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onErro(String mensagem) {
+                carregando(false);
+                Toast.makeText(SignupActivity.this, mensagem, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void carregando(boolean ativo) {
+        btnSignup.setEnabled(!ativo);
+        btnSignup.setText(ativo ? "Cadastrando..." : getString(R.string.action_signup));
     }
 }

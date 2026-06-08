@@ -19,30 +19,11 @@
         android:paddingBottom="40dp">
 
         <!-- Logo -->
-        <FrameLayout
-            android:layout_width="140dp"
-            android:layout_height="140dp">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:contentDescription="@string/brand_name"
-                android:src="@drawable/logo_bgl" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="BGL"
-                android:textColor="@color/gold_bright"
-                android:textSize="34sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.08"
-                android:shadowColor="#99000000"
-                android:shadowDx="0"
-                android:shadowDy="2"
-                android:shadowRadius="6" />
-        </FrameLayout>
+        <ImageView
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:contentDescription="@string/brand_name"
+            android:src="@drawable/logo_bgl" />
 
         <!-- Brand name -->
         <TextView

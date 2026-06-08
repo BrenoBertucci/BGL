@@ -1,0 +1,78 @@
+package com.example.bgl.controller;
+
+import android.content.Context;
+
+import androidx.annotation.NonNull;
+
+import com.example.bgl.model.ItemSalvo;
+import com.example.bgl.network.ApiClient;
+import com.example.bgl.network.SupabaseDataService;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+/**
+ * Controller da lista de FAVORITOS (UC05 / UC08).
+ *
+ * ESTE É O EXEMPLO COMPLETO. Os controllers de Assistindo e Watchlist
+ * seguem exatamente o mesmo formato — você só troca o endpoint.
+ */
+public class FavoritosController {
+
+    private final SupabaseDataService api;
+    private final SessionController session;
+
+    public FavoritosController(Context context) {
+        this.api = ApiClient.getSupabaseData();
+        this.session = new SessionController(context.getApplicationContext());
+    }
+
+    /** Busca no Supabase todos os favoritos do usuário logado (UC08). */
+    public void listar(ListaCallback callback) {
+        String bearer = "Bearer " + session.getAccessToken();
+
+        api.listarFavoritos(bearer, "*").enqueue(new Callback<List<ItemSalvo>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<ItemSalvo>> call,
+                                   @NonNull Response<List<ItemSalvo>> resp) {
+                if (resp.isSuccessful() && resp.body() != null) {
+                    callback.onSucesso(resp.body());
+                } else {
+                    callback.onErro("Não foi possível carregar os favoritos.");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<ItemSalvo>> call, @NonNull Throwable t) {
+                callback.onErro("Sem conexão. Tente novamente.");
+            }
+        });
+    }
+
+    /** Adiciona um título aos favoritos (UC05). */
+    public void adicionar(ItemSalvo item, ListaCallback callback) {
+        String bearer = "Bearer " + session.getAccessToken();
+
+        // Preenche o dono do registro (necessário para o RLS aceitar o insert).
+        item.userId = session.getUserId();
+
+        api.inserirFavorito(bearer, item).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> resp) {
+                if (resp.isSuccessful()) {
+                    callback.onSucesso(null);
+                } else {
+                    callback.onErro("Não foi possível favoritar.");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                callback.onErro("Sem conexão. Tente novamente.");
+            }
+        });
+    }
+}

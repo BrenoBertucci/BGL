@@ -1,52 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
-    android:width="140dp"
-    android:height="140dp"
-    android:viewportWidth="140"
-    android:viewportHeight="140">
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
 
-    <!-- Outer glass halo -->
+    <!-- Fundo suave para dar destaque ao monograma -->
     <path
-        android:pathData="M70,70m-68,0a68,68 0,1 1,136 0a68,68 0,1 1,-136 0"
-        android:fillColor="#1AFFFFFF" />
+        android:pathData="M50,50m-45,0a45,45 0,1 1,90 0a45,45 0,1 1,-90 0"
+        android:fillColor="#0DFFFFFF" />
 
-    <!-- Gold outer ring -->
+    <!-- Estilização do Monograma BGL inspirado na imagem -->
+    <!-- Letra G (Gold - Central) -->
     <path
-        android:pathData="M70,70m-58,0a58,58 0,1 1,116 0a58,58 0,1 1,-116 0"
-        android:strokeColor="#F6D98A"
-        android:strokeWidth="3"
-        android:fillColor="#00000000" />
+        android:pathData="M50,30 C38,30 30,38 30,50 C30,62 38,70 50,70 C58,70 65,65 68,58 L58,58 C56,60 53,62 50,62 C44,62 38,56 38,50 C38,44 44,38 50,38 C54,38 57,40 59,44 L69,44 C66,36 58,30 50,30 Z"
+        android:fillColor="@color/gold" />
 
-    <!-- Navy glass body -->
+    <!-- Letra B (Navy - Superior Esquerda) -->
     <path
-        android:pathData="M70,70m-50,0a50,50 0,1 1,100 0a50,50 0,1 1,-100 0">
-        <aapt:attr name="android:fillColor">
-            <gradient
-                android:type="linear"
-                android:startX="30" android:startY="20"
-                android:endX="110" android:endY="120">
-                <item android:offset="0" android:color="#FF24326B" />
-                <item android:offset="1" android:color="#FF0C1230" />
-            </gradient>
-        </aapt:attr>
-    </path>
+        android:pathData="M35,25 L50,25 C55,25 58,28 58,32 C58,35 56,38 53,39 C57,40 60,43 60,47 C60,52 56,55 50,55 L35,55 Z M43,32 L43,38 L48,38 C50,38 52,37 52,35 C52,33 50,32 48,32 Z M43,43 L43,50 L49,50 C52,50 53,49 53,47 C53,45 52,43 49,43 Z"
+        android:fillColor="@color/navy_glow" />
 
-    <!-- Inner gold aperture ring -->
+    <!-- Letra L (Navy - Inferior Direita) -->
     <path
-        android:pathData="M70,70m-38,0a38,38 0,1 1,76 0a38,38 0,1 1,-76 0"
-        android:strokeColor="#80E9C46A"
-        android:strokeWidth="1.5"
-        android:fillColor="#00000000" />
+        android:pathData="M55,45 L55,75 L75,75 L75,68 L63,68 L63,45 Z"
+        android:fillColor="@color/navy_glow" />
 
-    <!-- Aperture blades (camera iris motif) -->
-    <path android:pathData="M70,34 L92,52 L70,70 Z" android:fillColor="#33F6D98A" />
-    <path android:pathData="M106,70 L84,88 L70,70 Z" android:fillColor="#26E9C46A" />
-    <path android:pathData="M70,106 L48,88 L70,70 Z" android:fillColor="#33F6D98A" />
-    <path android:pathData="M34,70 L56,52 L70,70 Z" android:fillColor="#26E9C46A" />
-
-    <!-- Top glossy highlight -->
-    <path
-        android:pathData="M44,40 Q70,28 96,40 Q70,52 44,40 Z"
-        android:fillColor="#40FFFFFF" />
 </vector>
