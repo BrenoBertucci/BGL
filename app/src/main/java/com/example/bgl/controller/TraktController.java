@@ -37,10 +37,6 @@ public class TraktController {
     }
 
     public void buscar(String termo, Filtro filtro, BuscaCallback callback) {
-        if (BuildConfig.TRAKT_CLIENT_ID == null || BuildConfig.TRAKT_CLIENT_ID.isEmpty()) {
-            callback.onErro("Configure o TRAKT_CLIENT_ID no build.gradle.kts.");
-            return;
-        }
 
         String tipo = tipoDoFiltro(filtro);
 
