@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.example.bgl.BuildConfig;
 import com.example.bgl.model.TraktBusca;
+import com.example.bgl.model.TraktPessoas;
 import com.example.bgl.model.Titulo;
 import com.example.bgl.network.ApiClient;
 import com.example.bgl.network.TraktService;
@@ -30,6 +31,12 @@ public class TraktController {
         void onErro(String mensagem);
     }
 
+    /** Retorno do elenco: lista de nomes de atores. */
+    public interface ElencoCallback {
+        void onSucesso(List<String> nomes);
+        void onErro(String mensagem);
+    }
+
     private final TraktService api;
 
     public TraktController() {
@@ -53,6 +60,40 @@ public class TraktController {
 
             @Override
             public void onFailure(@NonNull Call<List<TraktBusca>> call, @NonNull Throwable t) {
+                callback.onErro("Sem conexão. Tente novamente.");
+            }
+        });
+    }
+
+    /**
+     * Busca o elenco de um título (UC04).
+     * @param traktId    id do título na Trakt
+     * @param tipoMovieTv "movie" ou "tv" (vem de Titulo.getTipo())
+     */
+    public void buscarElenco(int traktId, String tipoMovieTv, ElencoCallback callback) {
+        // A Trakt usa "movies"/"shows" no caminho.
+        String tipoPath = "movie".equals(tipoMovieTv) ? "movies" : "shows";
+
+        api.elenco(tipoPath, traktId).enqueue(new Callback<TraktPessoas>() {
+            @Override
+            public void onResponse(@NonNull Call<TraktPessoas> call,
+                                   @NonNull Response<TraktPessoas> resp) {
+                if (resp.isSuccessful() && resp.body() != null && resp.body().cast != null) {
+                    List<String> nomes = new ArrayList<>();
+                    for (TraktPessoas.Cast c : resp.body().cast) {
+                        if (c.person != null && c.person.name != null) {
+                            nomes.add(c.person.name);
+                        }
+                        if (nomes.size() >= 12) break;   // mostra só os principais
+                    }
+                    callback.onSucesso(nomes);
+                } else {
+                    callback.onErro("Não foi possível carregar o elenco.");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<TraktPessoas> call, @NonNull Throwable t) {
                 callback.onErro("Sem conexão. Tente novamente.");
             }
         });

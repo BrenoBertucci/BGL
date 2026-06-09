@@ -15,10 +15,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Controller da lista de FAVORITOS (UC05 / UC08).
- *
- * ESTE É O EXEMPLO COMPLETO. Os controllers de Assistindo e Watchlist
- * seguem exatamente o mesmo formato — você só troca o endpoint.
+ * Controller da lista de Favoritos (UC05 / UC08).
  */
 public class FavoritosController {
 
@@ -26,6 +23,7 @@ public class FavoritosController {
     private final SessionController session;
 
     public FavoritosController(Context context) {
+        ApiClient.init(context);
         this.api = ApiClient.getSupabaseData();
         this.session = new SessionController(context.getApplicationContext());
     }
@@ -76,5 +74,28 @@ public class FavoritosController {
                 callback.onErro("Sem conexão. Tente novamente.");
             }
         });
+    }
+
+    /** Remove um título dos favoritos (UC09). */
+    public void remover(ItemSalvo item, ListaCallback callback) {
+        String bearer = "Bearer " + session.getAccessToken();
+
+        // PostgREST usa o formato coluna=eq.valor para filtrar.
+        api.removerFavorito(bearer, "eq." + item.tmdbId, "eq." + item.tipo)
+                .enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> resp) {
+                        if (resp.isSuccessful()) {
+                            callback.onSucesso(null);
+                        } else {
+                            callback.onErro("Não foi possível remover.");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                        callback.onErro("Sem conexão. Tente novamente.");
+                    }
+                });
     }
 }

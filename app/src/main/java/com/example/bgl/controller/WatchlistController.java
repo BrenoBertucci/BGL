@@ -14,6 +14,7 @@ public class WatchlistController {
     private final SessionController session;
 
     public WatchlistController(Context context) {
+        ApiClient.init(context);
         this.api = ApiClient.getSupabaseData();
         this.session = new SessionController(context.getApplicationContext());
     }
@@ -61,5 +62,27 @@ public class WatchlistController {
             }
         });
 
+    }
+
+    /** Remove um título da Watchlist (UC09). */
+    public void remover(ItemSalvo item, ListaCallback callback) {
+        String bearer = "Bearer " + session.getAccessToken();
+
+        api.removerWatchlist(bearer, "eq." + item.tmdbId, "eq." + item.tipo)
+                .enqueue(new retrofit2.Callback<Void>() {
+                    @Override
+                    public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> resp) {
+                        if (resp.isSuccessful()) {
+                            callback.onSucesso(null);
+                        } else {
+                            callback.onErro("Não foi possível remover.");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                        callback.onErro("Sem conexão. Tente novamente.");
+                    }
+                });
     }
 }

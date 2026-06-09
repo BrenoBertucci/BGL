@@ -6,6 +6,7 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
@@ -27,11 +28,17 @@ public interface SupabaseDataService {
             @Header("Authorization") String bearer,
             @Query("select") String colunas);
 
-    @Headers({"Prefer: return=minimal"})
-    @POST("rest/v1/favoritos")
+    @Headers({"Prefer: return=minimal, resolution=merge-duplicates"})
+    @POST("rest/v1/favoritos?on_conflict=user_id,tmdb_id,tipo")
     Call<Void> inserirFavorito(
             @Header("Authorization") String bearer,
             @Body ItemSalvo item);
+
+    @DELETE("rest/v1/favoritos")
+    Call<Void> removerFavorito(
+            @Header("Authorization") String bearer,
+            @Query("tmdb_id") String tmdbEq,
+            @Query("tipo") String tipoEq);
 
     // ---------------- ASSISTINDO ----------------
     @GET("rest/v1/assistindo")
@@ -39,11 +46,17 @@ public interface SupabaseDataService {
             @Header("Authorization") String bearer,
             @Query("select") String colunas);
 
-    @Headers({"Prefer: return=minimal"})
-    @POST("rest/v1/assistindo")
+    @Headers({"Prefer: return=minimal, resolution=merge-duplicates"})
+    @POST("rest/v1/assistindo?on_conflict=user_id,tmdb_id,tipo")
     Call<Void> inserirAssistindo(
             @Header("Authorization") String bearer,
             @Body ItemSalvo item);
+
+    @DELETE("rest/v1/assistindo")
+    Call<Void> removerAssistindo(
+            @Header("Authorization") String bearer,
+            @Query("tmdb_id") String tmdbEq,
+            @Query("tipo") String tipoEq);
 
     // ---------------- WATCHLIST ----------------
     @GET("rest/v1/watchlist")
@@ -51,9 +64,15 @@ public interface SupabaseDataService {
             @Header("Authorization") String bearer,
             @Query("select") String colunas);
 
-    @Headers({"Prefer: return=minimal"})
-    @POST("rest/v1/watchlist")
+    @Headers({"Prefer: return=minimal, resolution=merge-duplicates"})
+    @POST("rest/v1/watchlist?on_conflict=user_id,tmdb_id,tipo")
     Call<Void> inserirWatchlist(
             @Header("Authorization") String bearer,
             @Body ItemSalvo item);
+
+    @DELETE("rest/v1/watchlist")
+    Call<Void> removerWatchlist(
+            @Header("Authorization") String bearer,
+            @Query("tmdb_id") String tmdbEq,
+            @Query("tipo") String tipoEq);
 }

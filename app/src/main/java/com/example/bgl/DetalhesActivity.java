@@ -8,6 +8,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.text.TextUtils;
+
 import com.bumptech.glide.Glide;
 import com.example.bgl.controller.FavoritosController;
 import com.example.bgl.controller.ListaCallback;
@@ -15,6 +17,7 @@ import com.example.bgl.model.ItemSalvo;
 import com.example.bgl.model.Titulo;
 import com.example.bgl.controller.AssistindoController;
 import com.example.bgl.controller.WatchlistController;
+import com.example.bgl.controller.TraktController;
 
 import java.util.List;
 
@@ -29,6 +32,7 @@ public class DetalhesActivity extends AppCompatActivity {
     private TextView txtTitulo;
     private TextView txtAnoNota;
     private TextView txtSinopse;
+    private TextView txtElenco;
     private Button btnFavoritar;
     private Button btnAssistindo;
     private Button btnWatchlist;
@@ -39,6 +43,7 @@ public class DetalhesActivity extends AppCompatActivity {
     private FavoritosController favoritosController;
     private AssistindoController assistindoController;
     private WatchlistController watchlistController;
+    private TraktController traktController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,12 +53,14 @@ public class DetalhesActivity extends AppCompatActivity {
         favoritosController = new FavoritosController(this);
         assistindoController = new AssistindoController(this);
         watchlistController = new WatchlistController(this);
+        traktController = new TraktController();
 
         // 1. Liga as variáveis às views do XML.
         imgPoster = findViewById(R.id.img_poster);
         txtTitulo = findViewById(R.id.txt_titulo);
         txtAnoNota = findViewById(R.id.txt_ano_nota);
         txtSinopse = findViewById(R.id.txt_sinopse);
+        txtElenco = findViewById(R.id.txt_elenco);
         btnFavoritar = findViewById(R.id.btn_favoritar);
         btnAssistindo = findViewById(R.id.btn_assistindo);
         btnWatchlist = findViewById(R.id.btn_watchlist);
@@ -64,6 +71,8 @@ public class DetalhesActivity extends AppCompatActivity {
         // 3. Monta a tela.
         preencherDados();
         configurarBotoes();
+        carregarElenco();        // UC04 — elenco
+        verificarListas();       // marca os botões já salvos
     }
 
     /** Mostra os dados do título na tela (pôster, nome, ano/nota e sinopse). */
@@ -84,12 +93,7 @@ public class DetalhesActivity extends AppCompatActivity {
                 .into(imgPoster);
     }
 
-    /**
-     * Botões de ação.
-     *  - "Favoritar" já está IMPLEMENTADO (exemplo).
-     *  - "Assistindo" e "Watchlist" ficam como EXERCÍCIO DA AULA:
-     *    é só copiar o padrão do favoritar, trocando o controller.
-     */
+    /** Liga os três botões de ação às suas listas. */
     private void configurarBotoes() {
         btnFavoritar.setOnClickListener(v -> favoritar());
         btnAssistindo.setOnClickListener(v -> marcarAssistindo());
@@ -167,5 +171,61 @@ public class DetalhesActivity extends AppCompatActivity {
                 Toast.makeText(DetalhesActivity.this, mensagem, Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    // ---------------------------------------------------------------
+    // Elenco (UC04)
+    // ---------------------------------------------------------------
+    private void carregarElenco() {
+        if (titulo == null) return;
+        txtElenco.setText("Carregando elenco...");
+
+        traktController.buscarElenco(titulo.id, titulo.getTipo(), new TraktController.ElencoCallback() {
+            @Override
+            public void onSucesso(List<String> nomes) {
+                if (nomes == null || nomes.isEmpty()) {
+                    txtElenco.setText("Elenco não disponível.");
+                } else {
+                    // Junta os nomes separados por vírgula (TextUtils funciona em qualquer API).
+                    txtElenco.setText(TextUtils.join(", ", nomes));
+                }
+            }
+
+            @Override
+            public void onErro(String mensagem) {
+                txtElenco.setText("Elenco não disponível.");
+            }
+        });
+    }
+
+    // ---------------------------------------------------------------
+    // Indica nos botões se o título já está em cada lista
+    // ---------------------------------------------------------------
+    private void verificarListas() {
+        if (titulo == null) return;
+
+        favoritosController.listar(new ListaCallback() {
+            @Override public void onSucesso(List<ItemSalvo> itens) { marcarSeContem(itens, btnFavoritar, "✓ Favorito"); }
+            @Override public void onErro(String mensagem) { }
+        });
+        assistindoController.listar(new ListaCallback() {
+            @Override public void onSucesso(List<ItemSalvo> itens) { marcarSeContem(itens, btnAssistindo, "✓ Assistindo"); }
+            @Override public void onErro(String mensagem) { }
+        });
+        watchlistController.listar(new ListaCallback() {
+            @Override public void onSucesso(List<ItemSalvo> itens) { marcarSeContem(itens, btnWatchlist, "✓ Na watchlist"); }
+            @Override public void onErro(String mensagem) { }
+        });
+    }
+
+    /** Se o título atual estiver na lista, troca o texto do botão para indicar. */
+    private void marcarSeContem(List<ItemSalvo> itens, Button botao, String textoMarcado) {
+        if (titulo == null || itens == null) return;
+        for (ItemSalvo item : itens) {
+            if (item.tmdbId == titulo.id && titulo.getTipo().equals(item.tipo)) {
+                botao.setText(textoMarcado);
+                return;
+            }
+        }
     }
 }

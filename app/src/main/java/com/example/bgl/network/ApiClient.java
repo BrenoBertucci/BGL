@@ -1,6 +1,9 @@
 package com.example.bgl.network;
 
+import android.content.Context;
+
 import com.example.bgl.BuildConfig;
+import com.example.bgl.controller.SessionController;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -19,25 +22,51 @@ public class ApiClient {
     private static SupabaseDataService supabaseDataService;
     private static TraktService traktService;
 
-    /** Cliente do Supabase AUTH (login, cadastro, logout). */
+    // Sessão usada pelo TokenAuthenticator para renovar o token.
+    private static SessionController session;
+
+    /** Deve ser chamado antes de usar o cliente de dados (passe qualquer Context). */
+    public static void init(Context context) {
+        if (session == null) {
+            session = new SessionController(context.getApplicationContext());
+        }
+    }
+
+    /** Cliente do Supabase AUTH (login, cadastro, logout). SEM renovação (evita loop). */
     public static SupabaseService getSupabase() {
         if (supabaseService == null) {
-            supabaseService = retrofitSupabase().create(SupabaseService.class);
+            OkHttpClient client = supabaseClientBuilder().build();
+            supabaseService = new Retrofit.Builder()
+                    .baseUrl(BuildConfig.SUPABASE_URL + "/")
+                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+                    .create(SupabaseService.class);
         }
         return supabaseService;
     }
 
-    /** Cliente das TABELAS do Supabase (favoritos, assistindo, watchlist). */
+    /** Cliente das TABELAS do Supabase. COM renovação automática do token (401). */
     public static SupabaseDataService getSupabaseData() {
         if (supabaseDataService == null) {
-            supabaseDataService = retrofitSupabase().create(SupabaseDataService.class);
+            OkHttpClient.Builder builder = supabaseClientBuilder();
+            if (session != null) {
+                builder.authenticator(new TokenAuthenticator(session));
+            }
+            OkHttpClient client = builder.build();
+            supabaseDataService = new Retrofit.Builder()
+                    .baseUrl(BuildConfig.SUPABASE_URL + "/")
+                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+                    .create(SupabaseDataService.class);
         }
         return supabaseDataService;
     }
 
-    /** Monta um Retrofit do Supabase que injeta "apikey" e "Content-Type" em toda chamada. */
-    private static Retrofit retrofitSupabase() {
-        OkHttpClient client = new OkHttpClient.Builder()
+    /** Builder com os headers "apikey" e "Content-Type" em toda chamada do Supabase. */
+    private static OkHttpClient.Builder supabaseClientBuilder() {
+        return new OkHttpClient.Builder()
                 .addInterceptor(chain -> {
                     okhttp3.Request original = chain.request();
                     okhttp3.Request comHeaders = original.newBuilder()
@@ -46,14 +75,7 @@ public class ApiClient {
                             .build();
                     return chain.proceed(comHeaders);
                 })
-                .addInterceptor(logging())
-                .build();
-
-        return new Retrofit.Builder()
-                .baseUrl(BuildConfig.SUPABASE_URL + "/")
-                .client(client)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+                .addInterceptor(logging());
     }
 
     /** Cliente da Trakt: injeta os headers obrigatórios em toda chamada. */

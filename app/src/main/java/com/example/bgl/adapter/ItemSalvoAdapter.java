@@ -22,7 +22,17 @@ import java.util.List;
  */
 public class ItemSalvoAdapter extends RecyclerView.Adapter<ItemSalvoAdapter.ViewHolder> {
 
+    /** Avisa a tela quando o usuário segura um item (para remover). */
+    public interface OnRemover {
+        void onRemover(ItemSalvo item);
+    }
+
     private final List<ItemSalvo> lista = new ArrayList<>();
+    private final OnRemover listener;
+
+    public ItemSalvoAdapter(OnRemover listener) {
+        this.listener = listener;
+    }
 
     /** Troca a lista exibida e atualiza a tela. */
     public void atualizar(List<ItemSalvo> novos) {
@@ -49,6 +59,12 @@ public class ItemSalvoAdapter extends RecyclerView.Adapter<ItemSalvoAdapter.View
         Glide.with(holder.itemView.getContext())
                 .load(item.posterUrl)
                 .into(holder.imgPoster);
+
+        // Segurar o item pede a remoção (a tela mostra a confirmação).
+        holder.itemView.setOnLongClickListener(v -> {
+            if (listener != null) listener.onRemover(item);
+            return true;
+        });
     }
 
     @Override

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Tela de Detalhes (UC04). O layout está pronto.
-     A LÓGICA (preencher os campos e os botões) será feita em aula. -->
+<!-- Tela de Detalhes (UC04). -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/detalhes_root"
@@ -53,6 +52,25 @@
             android:textColor="@color/text_secondary"
             android:textSize="15sp"
             android:lineSpacingExtra="4dp" />
+
+        <!-- Elenco -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Elenco"
+            android:textColor="@color/gold"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txt_elenco"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/text_secondary"
+            android:textSize="15sp"
+            android:lineSpacingExtra="3dp" />
 
         <!-- Botões de ação (UC05, UC06, UC07) -->
         <Button

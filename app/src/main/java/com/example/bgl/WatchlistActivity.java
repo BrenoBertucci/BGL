@@ -2,7 +2,9 @@ package com.example.bgl;
 
 import android.os.Bundle;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,9 +17,7 @@ import com.example.bgl.model.ItemSalvo;
 import java.util.List;
 
 /**
- * Tela "Assistir Mais Tarde" / Watchlist (UC08). A TELA está pronta;
- * quem carrega os dados é o WatchlistController — o EXERCÍCIO DA AULA.
- * Quando você implementar o controller, esta tela já vai funcionar.
+ * Tela "Assistir Mais Tarde" / Watchlist (UC08).
  */
 public class WatchlistActivity extends AppCompatActivity {
 
@@ -35,11 +35,36 @@ public class WatchlistActivity extends AppCompatActivity {
         txtStatus = findViewById(R.id.txt_status);
         RecyclerView recycler = findViewById(R.id.recycler_lista);
 
-        adapter = new ItemSalvoAdapter();
+        adapter = new ItemSalvoAdapter(this::confirmarRemocao);
         recycler.setLayoutManager(new LinearLayoutManager(this));
         recycler.setAdapter(adapter);
 
         carregar();
+    }
+
+    /** Mostra um diálogo de confirmação antes de remover (UC09). */
+    private void confirmarRemocao(ItemSalvo item) {
+        new AlertDialog.Builder(this)
+                .setTitle("Remover")
+                .setMessage("Remover \"" + item.titulo + "\" da Watchlist?")
+                .setNegativeButton("Cancelar", null)
+                .setPositiveButton("Remover", (dialog, which) -> remover(item))
+                .show();
+    }
+
+    private void remover(ItemSalvo item) {
+        watchlistController.remover(item, new ListaCallback() {
+            @Override
+            public void onSucesso(List<ItemSalvo> itens) {
+                Toast.makeText(WatchlistActivity.this, "Removido.", Toast.LENGTH_SHORT).show();
+                carregar();
+            }
+
+            @Override
+            public void onErro(String mensagem) {
+                Toast.makeText(WatchlistActivity.this, mensagem, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void carregar() {
