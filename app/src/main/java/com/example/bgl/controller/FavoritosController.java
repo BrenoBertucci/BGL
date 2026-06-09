@@ -64,6 +64,8 @@ public class FavoritosController {
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> resp) {
                 if (resp.isSuccessful()) {
                     callback.onSucesso(null);
+                } else if (resp.code() == 409) {
+                    callback.onErro("Já está na lista.");
                 } else {
                     callback.onErro("Não foi possível favoritar.");
                 }

@@ -13,23 +13,12 @@ import com.example.bgl.controller.FavoritosController;
 import com.example.bgl.controller.ListaCallback;
 import com.example.bgl.model.ItemSalvo;
 import com.example.bgl.model.Titulo;
+import com.example.bgl.controller.AssistindoController;
+import com.example.bgl.controller.WatchlistController;
 
 import java.util.List;
 
-/**
- * Tela de Detalhes do título (UC04).
- *
- * ====================================================================
- *  ATENÇÃO: esta tela está PROPOSITALMENTE sem a lógica.
- *  O layout (activity_detalhes.xml) já está pronto e as views já
- *  estão referenciadas aqui embaixo. O que falta é o EXERCÍCIO DA AULA:
- *
- *   1) Preencher os campos com os dados do "titulo" (método preencherDados).
- *   2) Fazer os 3 botões salvarem nas listas (método configurarBotoes).
- *
- *  Os TODOs marcam exatamente onde escrever cada parte.
- * ====================================================================
- */
+
 public class DetalhesActivity extends AppCompatActivity {
 
     /** Chave usada para receber o título enviado pela tela de Busca. */
@@ -48,6 +37,8 @@ public class DetalhesActivity extends AppCompatActivity {
     private Titulo titulo;
 
     private FavoritosController favoritosController;
+    private AssistindoController assistindoController;
+    private WatchlistController watchlistController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +46,8 @@ public class DetalhesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detalhes);
 
         favoritosController = new FavoritosController(this);
+        assistindoController = new AssistindoController(this);
+        watchlistController = new WatchlistController(this);
 
         // 1. Liga as variáveis às views do XML.
         imgPoster = findViewById(R.id.img_poster);
@@ -99,8 +92,8 @@ public class DetalhesActivity extends AppCompatActivity {
      */
     private void configurarBotoes() {
         btnFavoritar.setOnClickListener(v -> favoritar());
-
-        // TODO (aula): btnAssistindo e btnWatchlist — mesma ideia do favoritar.
+        btnAssistindo.setOnClickListener(v -> marcarAssistindo());
+        btnWatchlist.setOnClickListener(v -> marcarWatchlist());
     }
 
     /** Monta o item e manda salvar nos favoritos (UC05). */
@@ -124,6 +117,53 @@ public class DetalhesActivity extends AppCompatActivity {
             @Override
             public void onErro(String mensagem) {
                 btnFavoritar.setEnabled(true);
+                Toast.makeText(DetalhesActivity.this, mensagem, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private ItemSalvo montarItem(){
+        ItemSalvo item = new ItemSalvo();
+        item.tmdbId = titulo.id;
+        item.tipo = titulo.getTipo();                 // "movie" ou "tv"
+        item.titulo = titulo.getTituloExibicao();
+        item.posterUrl = titulo.getPosterUrl();
+        return item;
+    }
+
+    private void marcarAssistindo(){
+        if (titulo == null) return;
+
+        btnAssistindo.setEnabled(false);
+        assistindoController.adicionar(montarItem(), new ListaCallback() {
+            @Override
+            public void onSucesso(List<ItemSalvo> itens) {
+                btnAssistindo.setEnabled(true);
+                Toast.makeText(DetalhesActivity.this, "Adicionado aos assistindo!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onErro(String mensagem) {
+                btnAssistindo.setEnabled(true);
+                Toast.makeText(DetalhesActivity.this, mensagem, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void marcarWatchlist(){
+        if (titulo == null) return;
+
+        btnWatchlist.setEnabled(false);
+        watchlistController.adicionar(montarItem(), new ListaCallback() {
+            @Override
+            public void onSucesso(List<ItemSalvo> itens) {
+                btnWatchlist.setEnabled(true);
+                Toast.makeText(DetalhesActivity.this, "Adicionado à watchlist!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onErro(String mensagem) {
+                btnWatchlist.setEnabled(true);
                 Toast.makeText(DetalhesActivity.this, mensagem, Toast.LENGTH_LONG).show();
             }
         });

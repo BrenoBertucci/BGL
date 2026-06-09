@@ -1,19 +1,13 @@
 package com.example.bgl.controller;
 
 import android.content.Context;
-
+import java.util.List;
 import com.example.bgl.network.ApiClient;
 import com.example.bgl.network.SupabaseDataService;
-
-/**
- * Controller da "WATCHLIST" — Assistir Mais Tarde (UC07).
- *
- * ====================================================================
- *  EXERCÍCIO DA AULA — este controller está vazio de propósito.
- *  Use o FavoritosController como modelo: o código é IGUAL, só muda
- *  o endpoint chamado (api.listarWatchlist).
- * ====================================================================
- */
+import retrofit2.Call;
+import retrofit2.Response;
+import androidx.annotation.NonNull;
+import com.example.bgl.model.ItemSalvo;
 public class WatchlistController {
 
     private final SupabaseDataService api;
@@ -24,16 +18,48 @@ public class WatchlistController {
         this.session = new SessionController(context.getApplicationContext());
     }
 
-    /**
-     * EXERCÍCIO — Buscar os títulos da Watchlist do usuário.
-     *
-     * Passo a passo (copie do FavoritosController):
-     *   1) String bearer = "Bearer " + session.getAccessToken();
-     *   2) api.listarWatchlist(bearer, "*").enqueue(...);
-     *   3) no onResponse de sucesso: callback.onSucesso(resp.body());
-     *   4) nos erros: callback.onErro("mensagem");
-     */
+    
     public void listar(ListaCallback callback) {
-        // TODO (aula): implementar a busca da Watchlist.
+        String bearer = "Bearer " + session.getAccessToken();
+        api.listarWatchlist(bearer, "*").enqueue(new retrofit2.Callback<List<ItemSalvo>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<ItemSalvo>> call, @NonNull Response<List<ItemSalvo>> resp) {
+                if(!resp.isSuccessful() || resp.body() == null) {
+                    callback.onErro("Não foi possível carregar os resultados.");
+                    return;
+                }
+                callback.onSucesso(resp.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<ItemSalvo>> call, @NonNull Throwable t) {
+                callback.onErro("Sem conexão. Tente novamente.");
+            }
+        });
+    }
+
+    public void adicionar(ItemSalvo item, ListaCallback callback){
+        String bearer = "Bearer " + session.getAccessToken();
+
+        item.userId = session.getUserId();
+
+        api.inserirWatchlist(bearer, item).enqueue(new retrofit2.Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> resp) {
+                if (resp.isSuccessful()) {
+                    callback.onSucesso(null);
+                } else if (resp.code() == 409) {
+                    callback.onErro("Já está na lista.");
+                } else {
+                    callback.onErro("Não foi possível adicionar o item.");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                callback.onErro("Sem conexão. Tente novamente.");
+            }
+        });
+
     }
 }

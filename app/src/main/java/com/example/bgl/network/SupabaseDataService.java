@@ -8,6 +8,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
@@ -26,6 +27,7 @@ public interface SupabaseDataService {
             @Header("Authorization") String bearer,
             @Query("select") String colunas);
 
+    @Headers({"Prefer: return=minimal"})
     @POST("rest/v1/favoritos")
     Call<Void> inserirFavorito(
             @Header("Authorization") String bearer,
@@ -37,9 +39,21 @@ public interface SupabaseDataService {
             @Header("Authorization") String bearer,
             @Query("select") String colunas);
 
+    @Headers({"Prefer: return=minimal"})
+    @POST("rest/v1/assistindo")
+    Call<Void> inserirAssistindo(
+            @Header("Authorization") String bearer,
+            @Body ItemSalvo item);
+
     // ---------------- WATCHLIST ----------------
     @GET("rest/v1/watchlist")
     Call<List<ItemSalvo>> listarWatchlist(
             @Header("Authorization") String bearer,
             @Query("select") String colunas);
+
+    @Headers({"Prefer: return=minimal"})
+    @POST("rest/v1/watchlist")
+    Call<Void> inserirWatchlist(
+            @Header("Authorization") String bearer,
+            @Body ItemSalvo item);
 }
