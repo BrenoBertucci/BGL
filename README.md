@@ -7,7 +7,7 @@ de filmes/séries vêm da **API da Trakt**.
 
 > Projeto acadêmico (prova de Mobile). O código foi escrito para ser **fácil de ler**,
 > com responsabilidades separadas em *controllers*, *services* e *models*.
-
+Grupo: Breno, Leticia, Guilherme
 ---
 
 ## Sumário
