@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.example.bgl.BuildConfig;
 import com.example.bgl.controller.SessionController;
-
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -21,6 +20,26 @@ public class ApiClient {
     private static SupabaseService supabaseService;
     private static SupabaseDataService supabaseDataService;
     private static TraktService traktService;
+
+    // API SPRING BOOT.
+    // Se for usar o emulador do Android:
+    //private static final String SPRING_BOOT_URL = "http://10.0.2.2:8081/";
+    // Se for usar em LAN.
+    private static final String SPRING_BOOT_URL = "http://192.168.0.33:8081/";
+    private static DiarioService diarioService;
+
+    // Método construtor do cliente.
+    public static DiarioService getDiarioApi() {
+        if (diarioService == null) {
+            diarioService = new Retrofit.Builder()
+                    .baseUrl(SPRING_BOOT_URL)
+                    .client(new okhttp3.OkHttpClient.Builder().addInterceptor(logging()).build())
+                    .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create())
+                    .build()
+                    .create(DiarioService.class);
+        }
+        return diarioService;
+    }
 
     // Sessão usada pelo TokenAuthenticator para renovar o token.
     private static SessionController session;
