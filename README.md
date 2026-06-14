@@ -20,7 +20,8 @@ de filmes/séries vêm da **API da Trakt**.
 6. [Explicação detalhada do código](#6-explicação-detalhada-do-código)
 7. [Fluxos completos](#7-fluxos-completos-passo-a-passo)
 8. [Segurança](#8-segurança)
-9. [O que ainda é evolução futura](#9-o-que-ainda-é-evolução-futura)
+9. [Usuários de teste](#9-usuários-de-teste)
+10. [O que ainda é evolução futura](#10-o-que-ainda-é-evolução-futura)
 
 ---
 
@@ -149,17 +150,8 @@ buildConfigField("String", "TRAKT_CLIENT_ID", "\"SEU_CLIENT_ID_TRAKT\"")
 - **SUPABASE_KEY** é a *publishable* (pública por design). Quem protege os dados é o **RLS**.
 - **TRAKT_CLIENT_ID** vem de https://trakt.tv/oauth/applications (a busca não precisa do secret).
 
-### 4.2 Banco de dados
 
-No painel do Supabase, crie as tabelas `profiles`, `favoritos`, `assistindo` e `watchlist`
-com o RLS habilitado por usuário. A estrutura está descrita na seção 5.
-
-### 4.3 Autenticação por e-mail
-
-Em **Authentication → Providers → Email**, desligue **Confirm email** para o cadastro já
-entrar direto (o app foi feito para esse modo).
-
-### 4.4 Rodar
+### 4.2 Rodar
 
 Abra no **Android Studio**, faça **Sync Project with Gradle Files** e clique em **Run**.
 
@@ -176,10 +168,8 @@ Abra no **Android Studio**, faça **Sync Project with Gradle Files** e clique em
 
 ### Mecanismos automáticos (triggers)
 
-1. **`handle_new_user`** — quando um usuário se cadastra no Auth, cria o registro em
-   `profiles` automaticamente, lendo o `nome` que veio do app.
-2. **`set_updated_at`** — atualiza a coluna `updated_at` sozinha a cada `UPDATE`.
-3. **`mover_entre_listas`** — ao inserir em `assistindo`, remove o mesmo título de
+1. **`set_updated_at`** — atualiza a coluna `updated_at` sozinha a cada `UPDATE`.
+2. **`mover_entre_listas`** — ao inserir em `assistindo`, remove o mesmo título de
    `watchlist` (e vice-versa). Garante a regra "não pode estar nas duas ao mesmo tempo".
 
 ### Segurança no banco (RLS)
@@ -202,7 +192,7 @@ usamos `@SerializedName`.
 #### `AuthModels.java`
 Agrupa os DTOs de autenticação:
 - **`SignUpRequest`** — corpo do cadastro: `email`, `password` e um objeto `data` com o
-  `nome` (vai como *user metadata*; o trigger do banco lê o `nome` daí).
+  `nome` (vai como *user metadata* e é usado para preencher o perfil).
 - **`LoginRequest`** — `email` + `password`.
 - **`RefreshRequest`** — `refresh_token` (usado para renovar a sessão).
 - **`AuthResponse`** — resposta do Supabase: `access_token`, `refresh_token`, `expires_in`
@@ -459,7 +449,21 @@ elementos clicáveis (`glass_input_ripple`, `glass_circle`).
 
 ---
 
-## 9. O que ainda é evolução futura
+## 9. Usuários de teste
+
+Contas já cadastradas para login (senha igual para todas: `cineglow123`):
+
+| Nome        | E-mail                    | Senha       |
+|-------------|---------------------------|-------------|
+| Ana Souza   | ana.souza@cineglow.com    | cineglow123 |
+| Bruno Lima  | bruno.lima@cineglow.com   | cineglow123 |
+| Carla Dias  | carla.dias@cineglow.com   | cineglow123 |
+| Diego Melo  | diego.melo@cineglow.com   | cineglow123 |
+| Erica Nunes | erica.nunes@cineglow.com  | cineglow123 |
+
+---
+
+## 10. O que ainda é evolução futura
 
 - **Recuperação de senha** — o link "Esqueceu a senha?" hoje só exibe um aviso; falta o
   fluxo de reset por e-mail do Supabase.
