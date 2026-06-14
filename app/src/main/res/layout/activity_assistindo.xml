@@ -6,23 +6,43 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_cinematic"
     android:orientation="vertical"
-    android:padding="24dp"
+    android:paddingHorizontal="20dp"
+    android:paddingVertical="16dp"
     tools:context=".AssistindoActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- Header: voltar + título -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Assistindo"
-        android:textColor="@color/text_primary"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:letterSpacing="0.08" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/glass_circle"
+            android:contentDescription="@string/action_back"
+            android:src="@drawable/ic_arrow_back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:letterSpacing="0.08"
+            android:text="@string/title_assistindo"
+            android:textColor="@color/text_primary"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/txt_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="14dp"
+        android:gravity="center_horizontal"
+        android:lineSpacingExtra="4dp"
         android:textColor="@color/text_secondary"
         android:textSize="14sp" />
 
@@ -30,7 +50,9 @@
         android:id="@+id/recycler_lista"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:layout_marginTop="12dp"
-        android:clipToPadding="false" />
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:layoutAnimation="@anim/layout_fall_down"
+        android:overScrollMode="never" />
 </LinearLayout>

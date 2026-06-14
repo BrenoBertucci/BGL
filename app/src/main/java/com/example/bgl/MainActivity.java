@@ -3,21 +3,18 @@ package com.example.bgl;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bgl.adapter.TituloAdapter;
-import com.example.bgl.controller.AuthController;
 import com.example.bgl.controller.TraktController;
 import com.example.bgl.model.Titulo;
 
@@ -27,17 +24,18 @@ import java.util.List;
  * Tela de Busca (UC03). O usuário pesquisa um título na Trakt e os
  * resultados aparecem numa RecyclerView. Ao tocar em um item, abre
  * a tela de Detalhes (UC04).
+ *
+ * Chega-se aqui pelo Menu (hub); o botão de voltar retorna para lá.
+ * O logout fica somente no Menu — assim a navegação tem um caminho único.
  */
 public class MainActivity extends AppCompatActivity {
 
     private EditText inputSearch;
-    private TextView txtEmail;
     private TextView txtStatus;
     private Button btnSearch;
     private RecyclerView recycler;
 
     private TituloAdapter adapter;
-    private AuthController authController;
     private TraktController traktController;
 
     @Override
@@ -45,26 +43,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+        Ui.aplicarInsets(findViewById(R.id.main));
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
-            return insets;
-        });
-
-        authController = new AuthController(this);
         traktController = new TraktController();
 
         inputSearch = findViewById(R.id.input_search);
-        txtEmail = findViewById(R.id.txt_email);
         txtStatus = findViewById(R.id.txt_status);
         btnSearch = findViewById(R.id.btn_search);
         recycler = findViewById(R.id.recycler_resultados);
-        Button btnLogout = findViewById(R.id.btn_logout);
-
-        // Mostra o e-mail do usuário logado.
-        String email = authController.getSession().getEmail();
-        txtEmail.setText(email != null ? email : "");
+        ImageButton btnBack = findViewById(R.id.btn_back);
 
         // Configura a lista: layout vertical + adapter.
         adapter = new TituloAdapter(this::abrirDetalhes);
@@ -72,7 +59,16 @@ public class MainActivity extends AppCompatActivity {
         recycler.setAdapter(adapter);
 
         btnSearch.setOnClickListener(v -> buscar());
-        btnLogout.setOnClickListener(v -> sair());
+        btnBack.setOnClickListener(v -> finish());
+
+        // Buscar direto pelo teclado (ação "pesquisar").
+        inputSearch.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                buscar();
+                return true;
+            }
+            return false;
+        });
     }
 
     private void buscar() {
@@ -83,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         btnSearch.setEnabled(false);
-        txtStatus.setText("Buscando...");
+        txtStatus.setText(R.string.search_loading);
 
         traktController.buscar(termo, TraktController.Filtro.AMBOS, new TraktController.BuscaCallback() {
             @Override
@@ -95,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
                     txtStatus.setText("");
                 }
                 adapter.atualizar(resultados);
+                recycler.scheduleLayoutAnimation();   // entrada em cascata
             }
 
             @Override
@@ -110,21 +107,5 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, DetalhesActivity.class);
         intent.putExtra(DetalhesActivity.EXTRA_TITULO, titulo);
         startActivity(intent);
-    }
-
-    private void sair() {
-        authController.logout(new AuthController.AuthCallback() {
-            @Override
-            public void onSucesso() { irParaLogin(); }
-            @Override
-            public void onErro(String mensagem) { irParaLogin(); }
-        });
-    }
-
-    private void irParaLogin() {
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
     }
 }

@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.bgl.R;
 import com.example.bgl.model.Titulo;
 
@@ -57,8 +59,13 @@ public class TituloAdapter extends RecyclerView.Adapter<TituloAdapter.TituloView
         holder.txtAno.setText(titulo.getAno());
         holder.txtNota.setText("⭐ " + String.format("%.1f", titulo.voteAverage));
 
+        // Pôster com cantos arredondados (acompanha o cartão de vidro).
+        int raio = (int) (10 * holder.itemView.getResources().getDisplayMetrics().density);
         Glide.with(holder.itemView.getContext())
                 .load(titulo.getPosterUrl())
+                .placeholder(R.drawable.glass_input)
+                .error(R.drawable.glass_input)
+                .transform(new CenterCrop(), new RoundedCorners(raio))
                 .into(holder.imgPoster);
 
         // Ao tocar no item, avisa a tela (que abre os detalhes).

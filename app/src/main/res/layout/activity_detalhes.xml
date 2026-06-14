@@ -7,22 +7,51 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_cinematic"
     android:fillViewport="true"
+    android:overScrollMode="never"
     tools:context=".DetalhesActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="16dp">
+
+        <!-- Header: voltar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btn_back"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/glass_circle"
+                android:contentDescription="@string/action_back"
+                android:src="@drawable/ic_arrow_back" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:letterSpacing="0.08"
+                android:text="@string/title_detalhes"
+                android:textColor="@color/text_primary"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
         <!-- Pôster em destaque -->
         <ImageView
             android:id="@+id/img_poster"
             android:layout_width="match_parent"
             android:layout_height="360dp"
+            android:background="@drawable/glass_input"
             android:contentDescription="@string/brand_name"
-            android:scaleType="centerCrop"
-            android:background="@drawable/glass_input" />
+            android:scaleType="centerCrop" />
 
         <!-- Título -->
         <TextView
@@ -49,16 +78,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:lineSpacingExtra="4dp"
             android:textColor="@color/text_secondary"
-            android:textSize="15sp"
-            android:lineSpacingExtra="4dp" />
+            android:textSize="15sp" />
 
         <!-- Elenco -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
-            android:text="Elenco"
+            android:text="@string/label_elenco"
             android:textColor="@color/gold"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -68,9 +97,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:lineSpacingExtra="3dp"
             android:textColor="@color/text_secondary"
-            android:textSize="15sp"
-            android:lineSpacingExtra="3dp" />
+            android:textSize="15sp" />
 
         <!-- Botões de ação (UC05, UC06, UC07) -->
         <Button
@@ -80,7 +109,7 @@
             android:layout_marginTop="24dp"
             android:background="@drawable/glass_button_ripple"
             android:stateListAnimator="@null"
-            android:text="Favoritar"
+            android:text="@string/action_favoritar"
             android:textColor="@color/navy_deep"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -90,8 +119,9 @@
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:layout_marginTop="12dp"
-            android:background="@drawable/glass_input"
-            android:text="Assistindo"
+            android:background="@drawable/glass_input_ripple"
+            android:stateListAnimator="@null"
+            android:text="@string/action_assistindo"
             android:textColor="@color/text_primary"
             android:textSize="15sp" />
 
@@ -100,8 +130,9 @@
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:layout_marginTop="12dp"
-            android:background="@drawable/glass_input"
-            android:text="Assistir Mais Tarde"
+            android:background="@drawable/glass_input_ripple"
+            android:stateListAnimator="@null"
+            android:text="@string/action_watchlist"
             android:textColor="@color/text_primary"
             android:textSize="15sp" />
     </LinearLayout>

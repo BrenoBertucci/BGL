@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tela anterior volta deslizando da esquerda (voltar). -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:interpolator="@android:interpolator/decelerate_cubic"
+    android:duration="320">
+    <translate android:fromXDelta="-12%" android:toXDelta="0" />
+    <alpha android:fromAlpha="0.6" android:toAlpha="1" />
+</set>

@@ -1,8 +1,37 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Transições entre telas (liquid slide + fade). -->
+    <style name="WindowAnimations" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:activityOpenExitAnimation">@anim/slide_out_left</item>
+        <item name="android:activityCloseEnterAnimation">@anim/slide_in_left</item>
+        <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
+    </style>
+
     <!-- Base application theme. -->
     <style name="Base.Theme.BGL" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Paleta CINEGLOW (sempre escuro, visual cinematográfico). -->
+        <item name="colorPrimary">@color/gold</item>
+        <item name="colorOnPrimary">@color/navy_deep</item>
+        <item name="colorSecondary">@color/navy_glow</item>
+        <item name="android:colorBackground">@color/navy_deep</item>
+        <item name="colorSurface">@color/navy_dark</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+
+        <!-- Fundo cinematográfico já na janela (evita flash branco ao abrir telas). -->
+        <item name="android:windowBackground">@drawable/bg_cinematic</item>
+
+        <!-- Barras do sistema integradas ao visual liquid glass. -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+
+        <!-- Animações de transição entre Activities. -->
+        <item name="android:windowAnimationStyle">@style/WindowAnimations</item>
+
+        <!-- Realce dourado nos campos de texto. -->
+        <item name="android:textColorHighlight">#55E9C46A</item>
+        <item name="colorAccent">@color/gold</item>
     </style>
 
     <style name="Theme.BGL" parent="Base.Theme.BGL" />

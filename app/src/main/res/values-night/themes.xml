@@ -1,7 +1,4 @@
 <resources>
-    <!-- Base application theme. -->
-    <style name="Base.Theme.BGL" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
-    </style>
+    <!-- O CINEGLOW é sempre escuro: o tema noturno herda o mesmo visual. -->
+    <style name="Theme.BGL" parent="Base.Theme.BGL" />
 </resources>

@@ -96,6 +96,7 @@ app/src/main/
 │   ├── FavoritosActivity.java     # lista de favoritos
 │   ├── AssistindoActivity.java    # lista "assistindo"
 │   ├── WatchlistActivity.java     # lista "assistir mais tarde"
+│   ├── Ui.java                    # utilitário de edge-to-edge (insets)
 │   │
 │   ├── adapter/
 │   │   ├── TituloAdapter.java     # itens dos resultados de busca
@@ -126,6 +127,8 @@ app/src/main/
 │
 ├── res/layout/    # XMLs de todas as telas + itens de lista
 ├── res/drawable/  # fundo cinematográfico, vidro, ícones, logo
+├── res/anim/      # transições de tela e animação em cascata das listas
+├── res/values/    # cores, strings e tema (sempre escuro, liquid glass)
 └── AndroidManifest.xml
 ```
 
@@ -357,25 +360,52 @@ Um *Adapter* liga uma lista de dados às "linhas" visuais da `RecyclerView`. Usa
 Cada Activity cuida **só da interface**: liga as views (`findViewById`), reage a cliques e
 chama o controller certo. A lógica de rede mora nos controllers.
 
-- **`SplashActivity`** — tela inicial. Se há sessão salva, vai para o **Menu**; senão, para o
-  **Login** (auto-login).
+- **`SplashActivity`** — tela inicial. Anima a marca (logo com *bounce*, textos em fade
+  sequencial) e, após ~1,4s, vai com *crossfade* para o **Menu** (se há sessão salva) ou
+  para o **Login** (auto-login).
 - **`LoginActivity`** — valida e-mail/senha localmente, chama `AuthController.login(...)`,
   mostra "Entrando..." enquanto carrega e vai para o Menu no sucesso.
 - **`SignupActivity`** — valida (nome, e-mail, senha ≥ 6, confirmação), chama
   `AuthController.cadastrar(...)` e vai direto ao Menu (sem confirmação de e-mail).
 - **`MenuActivity`** — o *hub*. Mostra o e-mail logado e tem botões para **Buscar**,
-  **Favoritos**, **Assistindo**, **Watchlist** e **Sair**.
-- **`MainActivity` (Busca)** — campo de pesquisa + `RecyclerView`. Usa o `TraktController` e o
-  `TituloAdapter`. Ao tocar num resultado, abre os Detalhes mandando o `Titulo` via `Intent`.
-- **`DetalhesActivity`** — recebe o `Titulo`, mostra pôster (Glide), título, ano, nota,
-  sinopse (`preencherDados`) e o **elenco** (`carregarElenco`, via Trakt). Tem três botões que
+  **Favoritos**, **Assistindo**, **Watchlist** e **Sair**. O conteúdo entra com animação
+  de fade + subida. O **logout existe só aqui** — assim a navegação tem um caminho único.
+- **`MainActivity` (Busca)** — header com **botão de voltar** (retorna ao Menu) + campo de
+  pesquisa + `RecyclerView`. Usa o `TraktController` e o `TituloAdapter`; também busca pela
+  ação "pesquisar" do teclado. Ao tocar num resultado, abre os Detalhes mandando o `Titulo`
+  via `Intent`.
+- **`DetalhesActivity`** — header com **botão de voltar**; recebe o `Titulo`, mostra pôster
+  (Glide, com cantos arredondados e *placeholder* de vidro), título, ano, nota, sinopse
+  (`preencherDados`) e o **elenco** (`carregarElenco`, via Trakt). Tem três botões que
   salvam nas listas (`favoritar`, `marcarAssistindo`, `marcarWatchlist`) e, ao abrir, consulta
   as listas para **marcar os botões já salvos** (`verificarListas`). O `montarItem()` cria o
   `ItemSalvo` a partir do título para não repetir código.
-- **`FavoritosActivity` / `AssistindoActivity` / `WatchlistActivity`** — cada uma cria seu
-  controller, monta a `RecyclerView` com o `ItemSalvoAdapter` e chama `listar(...)`. Mostra
-  "Carregando...", a lista, ou o estado vazio. **Segurar um item** abre um diálogo de
-  confirmação e remove (UC09).
+- **`FavoritosActivity` / `AssistindoActivity` / `WatchlistActivity`** — header com **botão de
+  voltar**; cada uma cria seu controller, monta a `RecyclerView` com o `ItemSalvoAdapter` e
+  chama `listar(...)` no **`onResume`** (a lista sempre reflete o estado atual ao voltar).
+  Mostra "Carregando…", a lista (com entrada em cascata), ou o estado vazio com dica.
+  **Segurar um item** abre um diálogo de confirmação e remove (UC09).
+- **`Ui.java`** — utilitário que aplica os *insets* das barras do sistema somando-os ao
+  padding original da tela (edge-to-edge sem conteúdo embaixo da status bar).
+
+---
+
+### 6.6 Interface (Liquid Glass)
+
+O visual segue a estética **liquid glass**: fundo navy cinematográfico com brilhos
+(`bg_cinematic`), painéis e cartões translúcidos com borda clara (`glass_panel`,
+`glass_input`), botões dourados com brilho (`glass_button`) e ripple de toque em todos os
+elementos clicáveis (`glass_input_ripple`, `glass_circle`).
+
+- **Tema (`values/themes.xml`)** — o app é **sempre escuro** (o tema noturno herda o mesmo
+  estilo, então o modo claro do sistema não quebra o visual). A status bar e a barra de
+  navegação são transparentes e o fundo cinematográfico já vem na janela (sem flash branco
+  ao abrir telas).
+- **Transições de tela** — definidas no tema (`windowAnimationStyle`): a tela nova desliza
+  da direita com fade; ao voltar, a animação é invertida (`res/anim/slide_*`).
+- **Listas** — os itens entram em cascata (`layout_fall_down` + `scheduleLayoutAnimation`).
+- **Navegação** — todas as telas internas têm um botão circular de vidro para **voltar**;
+  o botão físico/gesto de voltar do Android funciona igual.
 
 ---
 
@@ -426,3 +456,18 @@ chama o controller certo. A lógica de rede mora nos controllers.
 - **Renovação de sessão:** feita automaticamente (sem pedir login de novo).
 - **Chave secreta:** **não** fica no app — só a *publishable*. O Client Secret da Trakt
   também não é usado (a busca usa só o Client ID).
+
+---
+
+## 9. O que ainda é evolução futura
+
+- **Recuperação de senha** — o link "Esqueceu a senha?" hoje só exibe um aviso; falta o
+  fluxo de reset por e-mail do Supabase.
+- **Progresso de séries** — o banco já tem `temporada_atual`/`episodio_atual` na tabela
+  `assistindo`, mas o app ainda não edita esses campos.
+- **Filtro de busca na interface** — o `TraktController` aceita Filme/Série/Ambos, porém a
+  tela de Busca usa sempre "Ambos"; faltam os botões de filtro.
+- **Paginação** — busca e listas carregam tudo de uma vez; com muitos resultados valeria
+  paginar.
+- **Testes** — só existem os testes de exemplo; faltam testes unitários dos controllers e
+  de interface (Espresso).

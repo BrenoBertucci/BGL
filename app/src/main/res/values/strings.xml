@@ -19,6 +19,34 @@
     <string name="action_signup">Cadastrar</string>
     <string name="have_account">Já tem conta? Faça login</string>
 
+    <!-- Navegação / títulos de tela -->
+    <string name="action_back">Voltar</string>
+    <string name="title_buscar">Buscar</string>
+    <string name="title_favoritos">Favoritos</string>
+    <string name="title_assistindo">Assistindo</string>
+    <string name="title_watchlist">Assistir Mais Tarde</string>
+    <string name="title_detalhes">Detalhes</string>
+
+    <!-- Busca -->
+    <string name="hint_search">Buscar filme ou série</string>
+    <string name="action_search">Buscar</string>
+    <string name="search_loading">Buscando…</string>
+
+    <!-- Menu -->
+    <string name="menu_buscar">Buscar Filmes e Séries</string>
+    <string name="action_logout">Sair</string>
+
+    <!-- Detalhes -->
+    <string name="label_elenco">Elenco</string>
+    <string name="action_favoritar">Favoritar</string>
+    <string name="action_assistindo">Assistindo</string>
+    <string name="action_watchlist">Assistir Mais Tarde</string>
+
+    <!-- Listas -->
+    <string name="lista_carregando">Carregando…</string>
+    <string name="lista_vazia">Você ainda não adicionou nenhum título aqui.\nToque em Buscar e explore o catálogo!</string>
+    <string name="lista_dica_remover">Segure um título para removê-lo da lista.</string>
+
     <!-- Validation -->
     <string name="error_required">Campo obrigatório</string>
     <string name="error_email_invalid">Email inválido</string>

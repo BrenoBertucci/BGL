@@ -7,17 +7,20 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_cinematic"
     android:fillViewport="true"
+    android:overScrollMode="never"
     tools:context=".MenuActivity">
 
     <LinearLayout
+        android:id="@+id/menu_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:gravity="center_horizontal"
+        android:orientation="vertical"
         android:padding="28dp">
 
         <!-- Logo -->
         <ImageView
+            android:id="@+id/img_logo"
             android:layout_width="110dp"
             android:layout_height="110dp"
             android:layout_marginTop="24dp"
@@ -28,11 +31,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:letterSpacing="0.22"
+            android:shadowColor="#80E9C46A"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="18"
             android:text="@string/brand_name"
             android:textColor="@color/text_primary"
             android:textSize="26sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.22" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txt_email"
@@ -50,7 +57,7 @@
             android:layout_marginTop="36dp"
             android:background="@drawable/glass_button_ripple"
             android:stateListAnimator="@null"
-            android:text="Buscar Filmes e Séries"
+            android:text="@string/menu_buscar"
             android:textColor="@color/navy_deep"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -60,8 +67,9 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="14dp"
-            android:background="@drawable/glass_input"
-            android:text="Favoritos"
+            android:background="@drawable/glass_input_ripple"
+            android:stateListAnimator="@null"
+            android:text="@string/title_favoritos"
             android:textColor="@color/text_primary"
             android:textSize="15sp" />
 
@@ -70,8 +78,9 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="14dp"
-            android:background="@drawable/glass_input"
-            android:text="Assistindo"
+            android:background="@drawable/glass_input_ripple"
+            android:stateListAnimator="@null"
+            android:text="@string/title_assistindo"
             android:textColor="@color/text_primary"
             android:textSize="15sp" />
 
@@ -80,8 +89,9 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="14dp"
-            android:background="@drawable/glass_input"
-            android:text="Assistir Mais Tarde"
+            android:background="@drawable/glass_input_ripple"
+            android:stateListAnimator="@null"
+            android:text="@string/title_watchlist"
             android:textColor="@color/text_primary"
             android:textSize="15sp" />
 
@@ -91,7 +101,7 @@
             android:layout_height="48dp"
             android:layout_marginTop="32dp"
             android:background="@android:color/transparent"
-            android:text="Sair"
+            android:text="@string/action_logout"
             android:textColor="@color/gold"
             android:textSize="14sp" />
     </LinearLayout>

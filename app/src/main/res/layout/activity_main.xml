@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Tela de Busca (UC03). Chega-se aqui pelo Menu; o botão de voltar retorna ao hub. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -6,46 +7,60 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_cinematic"
     android:orientation="vertical"
-    android:paddingHorizontal="24dp"
-    android:paddingTop="48dp"
-    android:paddingBottom="24dp"
+    android:paddingHorizontal="20dp"
+    android:paddingVertical="16dp"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/txt_welcome"
+    <!-- Header: voltar + título -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/brand_name"
-        android:textColor="@color/text_primary"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:letterSpacing="0.1" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/txt_email"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textColor="@color/text_secondary"
-        android:textSize="13sp" />
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/glass_circle"
+            android:contentDescription="@string/action_back"
+            android:src="@drawable/ic_arrow_back" />
 
-    <!-- Busca TMDB -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:letterSpacing="0.08"
+            android:text="@string/title_buscar"
+            android:textColor="@color/text_primary"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Campo de busca -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/glass_input"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp">
 
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:contentDescription="@string/hint_search"
+            android:src="@drawable/ic_search" />
+
         <EditText
             android:id="@+id/input_search"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:hint="Buscar filme ou série"
+            android:hint="@string/hint_search"
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:maxLines="1"
@@ -61,7 +76,7 @@
         android:layout_marginTop="14dp"
         android:background="@drawable/glass_button_ripple"
         android:stateListAnimator="@null"
-        android:text="Buscar"
+        android:text="@string/action_search"
         android:textColor="@color/navy_deep"
         android:textSize="15sp"
         android:textStyle="bold" />
@@ -71,7 +86,8 @@
         android:id="@+id/txt_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal"
         android:textColor="@color/text_secondary"
         android:textSize="14sp" />
 
@@ -80,17 +96,9 @@
         android:id="@+id/recycler_resultados"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="12dp"
         android:layout_weight="1"
-        android:layout_marginTop="12dp"
-        android:clipToPadding="false" />
-
-    <Button
-        android:id="@+id/btn_logout"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/glass_input"
-        android:text="Sair"
-        android:textColor="@color/gold"
-        android:textSize="14sp" />
+        android:clipToPadding="false"
+        android:layoutAnimation="@anim/layout_fall_down"
+        android:overScrollMode="never" />
 </LinearLayout>

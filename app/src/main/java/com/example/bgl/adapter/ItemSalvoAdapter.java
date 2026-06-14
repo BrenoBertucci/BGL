@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.bgl.R;
 import com.example.bgl.model.ItemSalvo;
 
@@ -56,8 +58,13 @@ public class ItemSalvoAdapter extends RecyclerView.Adapter<ItemSalvoAdapter.View
         holder.txtTitulo.setText(item.titulo);
         holder.txtTipo.setText(item.getTipoAmigavel());
 
+        // Pôster com cantos arredondados (acompanha o cartão de vidro).
+        int raio = (int) (10 * holder.itemView.getResources().getDisplayMetrics().density);
         Glide.with(holder.itemView.getContext())
                 .load(item.posterUrl)
+                .placeholder(R.drawable.glass_input)
+                .error(R.drawable.glass_input)
+                .transform(new CenterCrop(), new RoundedCorners(raio))
                 .into(holder.imgPoster);
 
         // Segurar o item pede a remoção (a tela mostra a confirmação).
