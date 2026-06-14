@@ -461,17 +461,3 @@ Contas já cadastradas para login (senha igual para todas: `cineglow123`):
 | Diego Melo  | diego.melo@cineglow.com   | cineglow123 |
 | Erica Nunes | erica.nunes@cineglow.com  | cineglow123 |
 
----
-
-## 10. O que ainda é evolução futura
-
-- **Recuperação de senha** — o link "Esqueceu a senha?" hoje só exibe um aviso; falta o
-  fluxo de reset por e-mail do Supabase.
-- **Progresso de séries** — o banco já tem `temporada_atual`/`episodio_atual` na tabela
-  `assistindo`, mas o app ainda não edita esses campos.
-- **Filtro de busca na interface** — o `TraktController` aceita Filme/Série/Ambos, porém a
-  tela de Busca usa sempre "Ambos"; faltam os botões de filtro.
-- **Paginação** — busca e listas carregam tudo de uma vez; com muitos resultados valeria
-  paginar.
-- **Testes** — só existem os testes de exemplo; faltam testes unitários dos controllers e
-  de interface (Espresso).
