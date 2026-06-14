@@ -148,7 +148,7 @@ buildConfigField("String", "TRAKT_CLIENT_ID", "\"SEU_CLIENT_ID_TRAKT\"")
 ```
 
 - **SUPABASE_KEY** é a *publishable* (pública por design). Quem protege os dados é o **RLS**.
-- **TRAKT_CLIENT_ID** vem de https://trakt.tv/oauth/applications (a busca não precisa do secret).
+- **TRAKT_CLIENT_ID** vem de https://trakt.tv/oauth/applications.
 
 
 ### 4.2 Rodar
