@@ -1,9 +1,10 @@
 # CINEGLOW — App de Catálogo de Filmes e Séries
 
 Aplicativo Android nativo (Java) para pesquisar filmes e séries, ver detalhes e salvar
-títulos em três listas pessoais — **Favoritos**, **Assistindo** e **Watchlist** (Assistir
-Mais Tarde). A autenticação e o armazenamento das listas ficam no **Supabase**, e os dados
-de filmes/séries vêm da **API da Trakt**.
+títulos em três listas pessoais — **Favoritos**, **Assistindo** e **Watchlist**. Além disso, 
+conta com um **Diário Privado** protegido por criptografia de ponta a ponta. A autenticação 
+e as listas ficam no **Supabase**, os dados vêm da **API da Trakt**, e o Diário Privado 
+opera com um **Backend Local em Spring Boot**.
 
 > Projeto acadêmico (prova de Mobile). O código foi escrito para ser **fácil de ler**,
 > com responsabilidades separadas em *controllers*, *services* e *models*.
@@ -38,6 +39,8 @@ de filmes/séries vêm da **API da Trakt**.
 | Imagens (pôsteres) | Glide |
 | Listas na tela | RecyclerView |
 | Token seguro | EncryptedSharedPreferences |
+| API Local (Diário) | Spring Boot + H2 Database |
+| Segurança de Dados | AES-128-CBC (Criptografia no Dispositivo) |
 
 A ideia central: **a tela nunca conversa direto com a internet**. Ela chama um *Controller*,
 que chama a camada de *rede* (Retrofit), que fala com o Supabase ou a Trakt. Isso deixa o
@@ -58,22 +61,23 @@ código organizado, testável e fácil de manter.
 ┌───────────────▼─────────────────────────────────────────────┐
 │  CONTROLLERS (regras / orquestração)                        │
 │  AuthController, TraktController, FavoritosController,      │
-│  AssistindoController, WatchlistController, SessionController│
+│  AssistindoController, WatchlistController,                 |
+|  SessionController, DiarioController                         │
 │  → montam as requisições e devolvem o resultado por callback │
 └───────────────┬─────────────────────────────────────────────┘
                 │ usam
 ┌───────────────▼─────────────────────────────────────────────┐
 │  NETWORK (Retrofit)                                         │
 │  ApiClient (fábrica), SupabaseService, SupabaseDataService, │
-│  TraktService, TokenAuthenticator                           │
+│  TraktService, TokenAuthenticator, DiarioService, Cryptoutil│
 └───────────────┬─────────────────────────────────────────────┘
                 │ HTTP
 ┌───────────────▼─────────────────────────────────────────────┐
-│  SERVIÇOS EXTERNOS:  Supabase   e   Trakt                    │
+│  SERVIÇOS EXTERNOS:  Supabase, Trakt e Spring Boot API      │
 └─────────────────────────────────────────────────────────────┘
 
          MODELS (DTOs) circulam entre todas as camadas:
-         AuthModels, Titulo, TraktBusca, ItemSalvo
+         AuthModels, Titulo, TraktBusca, ItemSalvo, DiarioDTO
 ```
 
 **Padrão de comunicação assíncrona:** como chamadas de rede não podem travar a tela, todo
@@ -86,6 +90,12 @@ principal, onde a tela atualiza com segurança.
 ## 3. Estrutura de pastas
 
 ```
+backend-api/                       # API Spring Boot (Diário Privado)
+├── src/main/java/api_diario/
+|    ├── controller/DiarioController.java
+|    ├── model/Diario.java
+|    ├── repository/DiarioRepository.java
+└── src/main/resources/application.properties
 app/src/main/
 ├── java/com/example/bgl/
 │   ├── SplashActivity.java        # decide: logado → Menu, senão → Login
@@ -110,22 +120,26 @@ app/src/main/
 │   │   ├── FavoritosController.java   # listar/adicionar favoritos
 │   │   ├── AssistindoController.java  # listar/adicionar assistindo
 │   │   ├── WatchlistController.java   # listar/adicionar watchlist
-│   │   └── ListaCallback.java         # callback compartilhado das listas
+│   │   ├── ListaCallback.java         # callback compartilhado das listas
+|   |   └── DiarioController.java
 │   │
 │   ├── model/
 │   │   ├── AuthModels.java        # DTOs de autenticação
 │   │   ├── Titulo.java            # filme/série (resultado de busca)
 │   │   ├── TraktBusca.java        # formato cru da resposta da Trakt (busca)
 │   │   ├── TraktPessoas.java      # resposta do elenco da Trakt
-│   │   └── ItemSalvo.java         # título salvo em uma lista
+│   │   ├── ItemSalvo.java         # título salvo em uma lista
+|   |   └── DiarioDTO.java
 │   │
-│   └── network/
-│       ├── ApiClient.java             # fábrica única dos clientes Retrofit
-│       ├── SupabaseService.java       # endpoints de Auth do Supabase
-│       ├── SupabaseDataService.java   # endpoints das tabelas (REST)
-│       ├── TraktService.java          # endpoint de busca da Trakt
-│       └── TokenAuthenticator.java    # renova o token no 401
-│
+│   ├── network/
+│   |   ├── ApiClient.java             # fábrica única dos clientes Retrofit
+│   |   ├── SupabaseService.java       # endpoints de Auth do Supabase
+│   |   ├── SupabaseDataService.java   # endpoints das tabelas (REST)
+│   |   ├── TraktService.java          # endpoint de busca da Trakt
+│   |   ├── TokenAuthenticator.java    # renova o token no 401
+│   |   └── DiarioService.java         # endpoint do Spring Boot
+|   └── utils/
+|       └── CryptoUtil.java            # Motor de criptografia AES.
 ├── res/layout/    # XMLs de todas as telas + itens de lista
 ├── res/drawable/  # fundo cinematográfico, vidro, ícones, logo
 ├── res/anim/      # transições de tela e animação em cascata das listas
@@ -150,34 +164,60 @@ buildConfigField("String", "TRAKT_CLIENT_ID", "\"SEU_CLIENT_ID_TRAKT\"")
 - **SUPABASE_KEY** é a *publishable* (pública por design). Quem protege os dados é o **RLS**.
 - **TRAKT_CLIENT_ID** vem de https://trakt.tv/oauth/applications.
 
+#### 4.1.1 Rodando a API Spring Boot (Backend Local)
+
+O aplicativo depende da API local para salvar o Diário Privado.
+
+1. Abra a pasta backend-api na sua IDE (IntelliJ, Eclipse, etc).
+
+2. Execute a classe principal ApiDiarioApplication.java.
+
+3. O servidor subirá na porta 8081 e criará o banco H2 em memória.
 
 ### 4.2 Rodar
 
 Abra no **Android Studio**, faça **Sync Project with Gradle Files** e clique em **Run**.
 
+#### 4.2.1 Para conectar o celular físico à API Spring Boot:
+
+Abra app/src/main/java/com/example/bgl/network/ApiClient.java.
+
+Altere a constante SPRING_BOOT_URL para o IP real da sua máquina na rede Wi-Fi (ex: http://192.168.0.33:8081/).
+
+O arquivo AndroidManifest.xml já possui a permissão android:usesCleartextTraffic="true" para permitir essa comunicação em ambiente de desenvolvimento.
+
+Faça o Sync Project with Gradle Files e clique em Run.
+
 ---
 
-## 5. Banco de dados (Supabase)
+## 5. Banco de dados 
 
-### Tabelas
+### (Supabase)
+
+#### Tabelas
 
 - **`profiles`** — perfil do usuário (id, email, nome). O `id` referencia `auth.users`.
 - **`favoritos`**, **`assistindo`**, **`watchlist`** — as três listas. Colunas principais:
   `user_id`, `tmdb_id` (guarda o id da Trakt), `tipo` (`'movie'` ou `'tv'`), `titulo`,
   `poster_url`, datas e `updated_at`. A `assistindo` ainda tem `temporada_atual`/`episodio_atual`.
 
-### Mecanismos automáticos (triggers)
+#### Mecanismos automáticos (triggers)
 
 1. **`set_updated_at`** — atualiza a coluna `updated_at` sozinha a cada `UPDATE`.
 2. **`mover_entre_listas`** — ao inserir em `assistindo`, remove o mesmo título de
    `watchlist` (e vice-versa). Garante a regra "não pode estar nas duas ao mesmo tempo".
 
-### Segurança no banco (RLS)
+#### Segurança no banco (RLS)
 
 Todas as tabelas têm **Row Level Security** ligado, com políticas `auth.uid() = user_id`.
 Tradução: **cada usuário só enxerga e altera as próprias linhas**, mesmo usando a mesma
 chave pública. A trava `UNIQUE(user_id, tmdb_id, tipo)` impede duplicatas e é o que permite
 o *upsert* do app (ver `SupabaseDataService`).
+
+### H2 Database (Memória Local)
+
+Utilizado pela API Spring Boot para persistir o Diário Privado.
+Acessível pelo navegador através de http://localhost:8081/h2-console (URL: jdbc:h2:mem:diariodb, Usuário: dba, Senha: 12345). Contém a tabela DIARIO (trakt_id PK, text_cifrado).
 
 ---
 
@@ -397,6 +437,25 @@ elementos clicáveis (`glass_input_ripple`, `glass_circle`).
 - **Navegação** — todas as telas internas têm um botão circular de vidro para **voltar**;
   o botão físico/gesto de voltar do Android funciona igual.
 
+### 6.7 Criptografia Local (CryptoUtil.java)
+Motor de segurança do aplicativo. Implementa o algoritmo AES/CBC/PKCS5Padding.
+
+criptografar(): Recebe o texto limpo, usa um vetor de inicialização (IV) e uma chave secreta de 16 bytes para embaralhar os dados, retornando uma string em Base64.
+
+descriptografar(): Recebe o Base64 do servidor e reverte o processo, devolvendo o texto legível à tela.
+
+### 6.8 O fluxo do Diário (DiarioDTO, DiarioService, DiarioController)
+
+Model (DiarioDTO): Carrega apenas o traktId e o textCifrado.
+
+Network (DiarioService): Mapeia o @POST (salvar/atualizar) e o @GET (buscar nota) apontando para o Spring Boot via Retrofit.
+
+Controller (DiarioController): Faz a ponte entre a UI e a rede. No método salvarDiario, ele primeiro intercepta o texto plano, passa pelo CryptoUtil, injeta o texto cifrado no DTO e só então faz a requisição de rede. O buscarDiario faz o processo reverso.
+
+### 6.9 Interface Atualizada (DetalhesActivity.java)
+
+Possui um novo botão Diário Privado. Ao clicar, a tela congela a interação para evitar duplicação de requests, busca a nota via controller (descriptografando no processo) e exibe um AlertDialog para o usuário ler ou editar suas reflexões.
+
 ---
 
 ## 7. Fluxos completos (passo a passo)
@@ -436,9 +495,24 @@ elementos clicáveis (`glass_input_ripple`, `glass_circle`).
 2. O `TokenAuthenticator` intercepta, renova com o `refresh_token`, salva o novo token e
    **repete** a requisição. O usuário não percebe nada.
 
+### Diário Privado (Criptografia de Ponta a Ponta)
+1. Na tela de Detalhes, o usuário clica em "Diário Privado".
+
+2. DiarioController envia um GET ao Spring Boot pedindo as notas daquele traktId.
+
+3. A string em Base64 é recebida, passada pelo CryptoUtil.descriptografar() na thread do Android, e mostrada na tela.
+
+4. O usuário digita uma nova nota e salva.
+
+5. O CryptoUtil.criptografar() transforma o texto em dados ilegíveis.
+
+6. O Retrofit envia o POST para o Spring Boot, que salva a string no banco H2 exatamente como a recebeu.
+
 ---
 
 ## 8. Segurança
+
+O aplicativo foi construído com fortes premissas de segurança:
 
 - **Token nunca em texto claro:** `EncryptedSharedPreferences` (Android Keystore).
 - **Isolamento por usuário:** RLS no Supabase (`auth.uid() = user_id`) — a chave pública do
@@ -446,6 +520,9 @@ elementos clicáveis (`glass_input_ripple`, `glass_circle`).
 - **Renovação de sessão:** feita automaticamente (sem pedir login de novo).
 - **Chave secreta:** **não** fica no app — só a *publishable*. O Client Secret da Trakt
   também não é usado (a busca usa só o Client ID).
+- **Token nunca em texto claro:** Sessão armazenada em `EncryptedSharedPreferences` via Android Keystore.
+- **Isolamento por usuário (RLS):** O banco de dados valida via `auth.uid() = user_id`, impossibilitando leitura de dados alheios pela chave pública.
+- **Privacidade Zero-Knowledge:** O servidor Spring Boot atua estritamente como um repositório cego. O texto das anotações do diário é cifrado localmente no dispositivo (AES-128) antes do tráfego de rede e só é decifrado no momento de exibição, garantindo que o backend jamais tenha acesso ao conteúdo em texto claro.
 
 ---
 
@@ -461,3 +538,9 @@ Contas já cadastradas para login (senha igual para todas: `cineglow123`):
 | Diego Melo  | diego.melo@cineglow.com   | cineglow123 |
 | Erica Nunes | erica.nunes@cineglow.com  | cineglow123 |
 
+## 10. O que ainda é evolução futura
+- Implementação de um fluxo de recuperação de senha.
+- Cache de imagens do Glide otimizado para navegação offline.
+- Paginação dinâmica (Infinite Scroll) nos resultados da Trakt.
+
+---
