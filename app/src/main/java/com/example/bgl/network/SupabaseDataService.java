@@ -9,6 +9,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.DELETE;
 import retrofit2.http.Query;
 
 /**
@@ -31,6 +32,14 @@ public interface SupabaseDataService {
             @Header("Authorization") String bearer,
             @Body ItemSalvo item);
 
+    // Correção.
+    @DELETE("rest/v1/favoritos")
+    Call<Void> removerFavorito(
+            @Header("Authorization") String bearer,
+            @Query("trakt_id") String traktIdEq,
+            @Query("tipo") String tipoEq
+    );
+
     // ---------------- ASSISTINDO ----------------
     @GET("rest/v1/assistindo")
     Call<List<ItemSalvo>> listarAssistindo(
@@ -43,6 +52,14 @@ public interface SupabaseDataService {
             @Header("Authorization") String bearer,
             @Body ItemSalvo item);
 
+    //Correção.
+    @DELETE("rest/v1/assistindo")
+    Call<Void> removerAssistindo(
+            @Header("Authorization") String bearer,
+            @Query("trakt_id") String traktIdEq,
+            @Query("tipo") String tipoEq
+    );
+
     // ---------------- WATCHLIST ----------------
     @GET("rest/v1/watchlist")
     Call<List<ItemSalvo>> listarWatchlist(
@@ -53,4 +70,12 @@ public interface SupabaseDataService {
     Call<Void> inserirWatchlist(
             @Header("Authorization") String bearer,
             @Body ItemSalvo item);
+
+    // Correção.
+    @DELETE("rest/v1/watchlist")
+    Call<Void> removerWatchlist(
+            @Header("Authorization") String bearer,
+            @Query("trakt_id") String traktIdEq,
+            @Query("tipo") String tipoEq
+    );
 }

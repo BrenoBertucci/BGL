@@ -1,7 +1,9 @@
 package com.example.bgl;
 
 import android.os.Bundle;
+import android.text.InputType;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -9,6 +11,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.example.bgl.controller.DiarioController;
 import com.example.bgl.controller.FavoritosController;
 import com.example.bgl.controller.ListaCallback;
 import com.example.bgl.model.ItemSalvo;
@@ -32,6 +35,7 @@ public class DetalhesActivity extends AppCompatActivity {
     private Button btnFavoritar;
     private Button btnAssistindo;
     private Button btnWatchlist;
+    private Button btnDiario;
 
     // O filme/série que veio da tela anterior.
     private Titulo titulo;
@@ -39,6 +43,7 @@ public class DetalhesActivity extends AppCompatActivity {
     private FavoritosController favoritosController;
     private AssistindoController assistindoController;
     private WatchlistController watchlistController;
+    private DiarioController diarioController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +53,8 @@ public class DetalhesActivity extends AppCompatActivity {
         favoritosController = new FavoritosController(this);
         assistindoController = new AssistindoController(this);
         watchlistController = new WatchlistController(this);
+        // Controller novo.
+        diarioController = new DiarioController();
 
         // 1. Liga as variáveis às views do XML.
         imgPoster = findViewById(R.id.img_poster);
@@ -57,6 +64,8 @@ public class DetalhesActivity extends AppCompatActivity {
         btnFavoritar = findViewById(R.id.btn_favoritar);
         btnAssistindo = findViewById(R.id.btn_assistindo);
         btnWatchlist = findViewById(R.id.btn_watchlist);
+        // Botão novo.
+        btnDiario =findViewById(R.id.btn_diario);
 
         // 2. Recebe o título enviado pela tela de Busca.
         titulo = (Titulo) getIntent().getSerializableExtra(EXTRA_TITULO);
@@ -94,6 +103,8 @@ public class DetalhesActivity extends AppCompatActivity {
         btnFavoritar.setOnClickListener(v -> favoritar());
         btnAssistindo.setOnClickListener(v -> marcarAssistindo());
         btnWatchlist.setOnClickListener(v -> marcarWatchlist());
+        // Novo Botão.
+        btnDiario.setOnClickListener(v -> buscarEAbrirDiario());
     }
 
     /** Monta o item e manda salvar nos favoritos (UC05). */
@@ -159,6 +170,71 @@ public class DetalhesActivity extends AppCompatActivity {
             @Override
             public void onErro(String mensagem) {
                 Toast.makeText(DetalhesActivity.this, mensagem, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+    // Novos métodos de Diário.
+    private void buscarEAbrirDiario() {
+        if (titulo == null) return;
+
+        btnDiario.setEnabled(false);
+        btnDiario.setText("Descriptografando...");
+
+        diarioController.buscarDiario(titulo.id, new DiarioController.DiarioCallback() {
+            @Override
+            public void onSucesso(String notaDescriptografada) {
+                btnDiario.setEnabled(true);
+                btnDiario.setText("Diário Privado");
+                mostrarDialogoNota(notaDescriptografada);
+            }
+
+            @Override
+            public void onErro(String mensagem) {
+                btnDiario.setEnabled(true);
+                btnDiario.setText("Diário Privado");
+                Toast.makeText(DetalhesActivity.this, mensagem, Toast.LENGTH_SHORT).show();
+                // Mostra nada se falhar.
+                mostrarDialogoNota("");
+            }
+        });
+
+    }
+
+    private void mostrarDialogoNota(String textoAtual) {
+        EditText inputNota = new EditText(this);
+        inputNota.setHint("Escreva suas reflexões secretas aqui...");
+        // Ajusta a caixa de texto para suportar múltiplas linhas.
+        inputNota.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        inputNota.setLines(4);
+
+        if (textoAtual != null && !textoAtual.isEmpty()) {
+            inputNota.setText(textoAtual);
+        }
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Diáro de Bordo")
+                .setMessage("Anotações cifradas (AES-128). O servidor não pode lê-las.")
+                .setView(inputNota)
+                .setPositiveButton("Salvar", (dialog, which) -> {
+                    String textoPlano = inputNota.getText().toString();
+                    salvarNotaNoDiario(textoPlano);
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void salvarNotaNoDiario(String textoPlano) {
+        if (titulo == null) return;
+
+        diarioController.salvarDiario(titulo.id, textoPlano, new DiarioController.DiarioCallback() {
+            @Override
+            public void onSucesso(String notaDescriptografada) {
+                Toast.makeText(DetalhesActivity.this, "Anotação segura no servidor!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onErro(String mensagem) {
+                Toast.makeText(DetalhesActivity.this, "Erro: " + mensagem, Toast.LENGTH_LONG).show();
             }
         });
     }
