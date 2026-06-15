@@ -69,7 +69,7 @@ public class FavoritosController {
                     return;
                 }
 
-                // 2. Trata os erros de forma enxuta e organizada
+                // Trata os erros de forma enxuta e organizada
                 switch (resp.code()) {
                     case 409:
                         callback.onErro("Já está na lista.");
@@ -87,17 +87,13 @@ public class FavoritosController {
                         callback.onErro("Não foi possível adicionar o item.");
                         break;
                 }
-
-                @Override
-                public void onFailure
-                (@NonNull
-                Call<Void> call, @NonNull Throwable t
-                    
-                ) {
-                callback.onErro("Sem conexão. Tente novamente.");
-                }
             }
-        );
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                callback.onErro("Sem conexão. Tente novamente.");
+            }
+        });
     }
 
     /**
