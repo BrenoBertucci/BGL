@@ -26,7 +26,7 @@ public class AssistindoController {
         api.listarAssistindo(bearer, "*").enqueue(new retrofit2.Callback<List<ItemSalvo>>() {
             @Override
             public void onResponse(@NonNull Call<List<ItemSalvo>> call, @NonNull Response<List<ItemSalvo>> resp) {
-                if(!resp.isSuccessful() || resp.body() == null) {
+                if (!resp.isSuccessful() || resp.body() == null) {
                     callback.onErro("Não foi possível carregar os resultados.");
                     return;
                 }
@@ -40,7 +40,7 @@ public class AssistindoController {
         });
     }
 
-    public void adicionar(ItemSalvo item, ListaCallback callback){
+    public void adicionar(ItemSalvo item, ListaCallback callback) {
         String bearer = "Bearer " + session.getAccessToken();
 
         item.userId = session.getUserId();
@@ -50,10 +50,25 @@ public class AssistindoController {
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> resp) {
                 if (resp.isSuccessful()) {
                     callback.onSucesso(null);
-                } else if (resp.code() == 409) {
-                    callback.onErro("Já está na lista.");
-                } else {
-                    callback.onErro("Não foi possível adicionar o item.");
+                    return;
+                }
+
+                switch (resp.code()) {
+                    case 409:
+                        callback.onErro("Já está na lista.");
+                        break;
+                    case 401:
+                        callback.onErro("Sessão expirada. Faça login novamente.");
+                        break;
+                    case 422:
+                        callback.onErro("Item inválido. Verifique os dados.");
+                        break;
+                    case 429:
+                        callback.onErro("Muitas requisições. Tente mais tarde.");
+                        break;
+                    default:
+                        callback.onErro("Não foi possível adicionar o item.");
+                        break;
                 }
             }
 
@@ -64,7 +79,9 @@ public class AssistindoController {
         });
     }
 
-    /** Remove um título da lista "Assistindo" (UC09). */
+    /**
+     * Remove um título da lista "Assistindo" (UC09).
+     */
     public void remover(ItemSalvo item, ListaCallback callback) {
         String bearer = "Bearer " + session.getAccessToken();
 
