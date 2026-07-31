@@ -4,11 +4,11 @@
 
 **Catálogo de filmes e séries para Android — busca, detalhes e listas pessoais.**
 
-[![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white)](#)
-[![Java](https://img.shields.io/badge/Java-100%25-ED8B00?logo=openjdk&logoColor=white)](#)
-[![Supabase](https://img.shields.io/badge/Supabase-Auth%20%2B%20Postgres-3ECF8E?logo=supabase&logoColor=white)](#)
-[![Trakt](https://img.shields.io/badge/Trakt-API-ED1C24?logo=trakt&logoColor=white)](#)
-[![Retrofit](https://img.shields.io/badge/Retrofit-2-48B983)](#)
+![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white)
+![Java](https://img.shields.io/badge/Java-100%25-ED8B00?logo=openjdk&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-Auth%20%2B%20Postgres-3ECF8E?logo=supabase&logoColor=white)
+![Trakt](https://img.shields.io/badge/Trakt-API-ED1C24?logo=trakt&logoColor=white)
+![Retrofit](https://img.shields.io/badge/Retrofit-2-48B983)
 
 </div>
 
@@ -36,14 +36,6 @@ A autenticação e a persistência ficam no **Supabase** (Auth + PostgreSQL com 
 | 🌌 **UI autoral "liquid glass"** | Tema escuro cinematográfico, painéis translúcidos, animações em cascata. |
 
 ---
-
-## Capturas de tela
-
-> _Substituir pelos prints reais em `docs/screenshots/`._
-
-| Login | Busca | Detalhes | Listas |
-|:---:|:---:|:---:|:---:|
-| ![Login](docs/screenshots/login.png) | ![Busca](docs/screenshots/busca.png) | ![Detalhes](docs/screenshots/detalhes.png) | ![Listas](docs/screenshots/listas.png) |
 
 ---
 
@@ -482,4 +474,4 @@ Fundo navy cinematográfico com brilhos (`bg_cinematic`), painéis e cartões tr
 
 **Desenvolvido por** Breno Bertucci · Letícia · Guilherme — Fatec Mococa, disciplina de Programação Mobile.
 
-Este projeto usa a [API da Trakt](https://trakt.docs.apiary.io/) e não é afiliado à Trakt. Distribuído sob licença MIT — veja [`LICENSE`](LICENSE).
+Este projeto usa a [API da Trakt](https://trakt.docs.apiary.io/) e não é afiliado à Trakt.
